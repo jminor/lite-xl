@@ -229,8 +229,19 @@ local function begin_search(text, fn)
 end
 
 
+local function start_with_selected_text()
+  local view = core.active_view
+  if view == nil then return end
+  local doc = view.doc
+  if doc == nil then return end
+  local text = doc:get_text(doc:get_selection())
+  core.command_view:set_text(text, true)
+end
+
+
 command.add(nil, {
   ["project-search:find"] = function()
+    start_with_selected_text()
     core.command_view:enter("Find Text In Project", function(text)
       text = text:lower()
       begin_search(text, function(line_text)
@@ -240,6 +251,7 @@ command.add(nil, {
   end,
 
   ["project-search:find-regex"] = function()
+    start_with_selected_text()
     core.command_view:enter("Find Regex In Project", function(text)
       local re = regex.compile(text, "i")
       begin_search(text, function(line_text)
@@ -249,6 +261,7 @@ command.add(nil, {
   end,
 
   ["project-search:fuzzy-find"] = function()
+    start_with_selected_text()
     core.command_view:enter("Fuzzy Find Text In Project", function(text)
       begin_search(text, function(line_text)
         return common.fuzzy_match(line_text, text) and 1
